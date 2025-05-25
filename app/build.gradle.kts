@@ -60,7 +60,10 @@ dependencies {
 
     //coil
     implementation(libs.coil)
-    implementation(libs.coil.compose)
+    implementation(libs.coil.kt.coil.compose)
+
+    //viewmodel
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

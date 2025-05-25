@@ -1,5 +1,6 @@
 package com.example.wherewatch_frontend.presentation.ui.screens
 
+import MovieDetailsViewModel
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,13 +12,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -27,70 +28,85 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.example.wherewatch_frontend.data.model.Movie
-import coil.*
-import com.example.wherewatch_frontend.data.model.Platform
-import com.google.android.ads.mediationtestsuite.dataobjects.Country
+import androidx.navigation.NavController
+import coil.compose.AsyncImage
+import com.example.wherewatch_frontend.domain.model.Platform
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MovieDetailScreen() {
-    var movie: Movie
-    var onBack: () -> Unit
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(movie.title) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+fun MovieDetailScreen(navController: NavController,
+                      title: String,
+                      movieDetailsViewModel: MovieDetailsViewModel) {
+    val movie by movieDetailsViewModel.movie.collectAsState()
+    val isLoading by movieDetailsViewModel.isLoading.collectAsState()
+    val error by movieDetailsViewModel.errorMessage.collectAsState()
+    LaunchedEffect(title) {
+        movieDetailsViewModel.loadMovieByTitle(title)
+    }
+    if (isLoading) {
+        CircularProgressIndicator()
+    } else if (error != null) {
+        Text("Error: $error", color = Color.Red)
+    } else {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { movie?.let { Text(it.title) } },
+                    navigationIcon = {
+                        IconButton(onClick = {navController.popBackStack()}) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        }
+                    }
+                )
+            },
+            floatingActionButton = {
+                FloatingActionButton(onClick = {navController.popBackStack()}) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+                }
+            },
+            content = { innerPadding ->
+                Column(
+                    modifier = Modifier
+                        .padding(innerPadding)
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                        .fillMaxSize()
+                ) {
+                    // Información general de la película
+                    movie?.let { Text(text = it.title, style = MaterialTheme.typography.headlineMedium) }
+                    movie?.overview?.let {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(text = it, style = MaterialTheme.typography.bodyMedium)
+                    }
+                    movie?.releaseDate?.let {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(text = "Estreno: $it", style = MaterialTheme.typography.labelMedium)
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+
                     }
                 }
-            )
-        },
-        floatingActionButton = {
-            FloatingActionButton(onClick = onBack) {
-                Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
             }
-        },
-        content = { innerPadding ->
-            Column(
-                modifier = Modifier
-                    .padding(innerPadding)
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
-                    .fillMaxSize()
-            ) {
-                // Información general de la película
-                Text(text = movie.title, style = MaterialTheme.typography.headlineMedium)
-                movie.overview?.let {
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(text = it, style = MaterialTheme.typography.bodyMedium)
-                }
-                movie.releaseDate?.let {
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(text = "Estreno: $it", style = MaterialTheme.typography.labelMedium)
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-
-                }
-            }
-        }
-    )
+        )
+    }
 }
 
 @Composable
 fun MovieCountryCard(
-    country: com.example.wherewatch_frontend.data.model.Country,
+    country: com.example.wherewatch_frontend.domain.model.Country,
     platforms: List<Platform>
 ) {
     Card(

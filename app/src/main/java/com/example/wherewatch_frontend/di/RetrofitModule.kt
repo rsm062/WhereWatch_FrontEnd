@@ -1,6 +1,7 @@
 package com.example.wherewatch_frontend.di
 
-import com.example.wherewatch_frontend.WhereWhatch
+
+import com.example.wherewatch_frontend.data.source.remote.apis.MovieApi
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
@@ -29,8 +30,8 @@ val retrofitModule = module {
     }
 
     // Ejemplo de servicio
-    single<WhereWhatch> {
-        get<Retrofit>().create(WhereWhatch::class.java)
+    single<MovieApi> {
+        get<Retrofit>().create(MovieApi::class.java)
     }
 
 }

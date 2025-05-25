@@ -1,4 +1,4 @@
-package com.example.wherewatch_frontend.data.model
+package com.example.wherewatch_frontend.domain.model
 
 data class Platform(
     val id: Long,
