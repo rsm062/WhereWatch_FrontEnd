@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -80,7 +81,7 @@ fun MovieDetailScreen(
                 title = { movie?.let { Text(text = it.title) } },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.Clear, contentDescription = "Clear Filters")
+                        Icon(Icons.Default.Search, contentDescription = "Clear Filters")
                     }
                 }
             )
