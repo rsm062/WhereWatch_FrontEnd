@@ -6,11 +6,11 @@ import com.example.wherewatch_frontend.di.retrofitModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.GlobalContext.startKoin
 
-class WhereWhatch : Application() {
+class WhereWatch : Application() {
     override fun onCreate() {
         super.onCreate()
         startKoin {
-            androidContext(this@WhereWhatch)
+            androidContext(this@WhereWatch)
             modules(
                 appModule,
                 retrofitModule
