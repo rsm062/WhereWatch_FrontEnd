@@ -1,3 +1,5 @@
+package com.example.wherewatch_frontend.presentation.viewmodel
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.wherewatch_frontend.domain.model.Availability
@@ -16,17 +18,8 @@ class MovieDetailsViewModel(
     private val repository: MovieRepository
 ) : ViewModel() {
 
-    private val samplePlatform = Platform(1L, "Netflix", "https://example.com/netflix.png")
-    private val sampleCountry = Country(1L, "España", "ES")
-    private val sampleAvailability = Availability(platform = samplePlatform, country = sampleCountry)
-
-    private val sampleMovie = Movie(
-        id = 1L,
-        title = "Matrix",
-        overview = "Una película de ciencia ficción sobre realidades simuladas.",
-        releaseDate = "1999-03-31",
-        availabilities = listOf(sampleAvailability)
-    )
+    private val _searchResults = MutableStateFlow<List<Movie>>(emptyList())
+    val searchResults: StateFlow<List<Movie>> = _searchResults
 
     private val _movie = MutableStateFlow<Movie?>(null)
     val movie: StateFlow<Movie?> = _movie
@@ -57,7 +50,7 @@ class MovieDetailsViewModel(
         } ?: emptyList()
     }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
-    fun loadMovieByTitle(title: String) {
+    /*fun loadMovieByTitle(title: String) {
         viewModelScope.launch {
             _isLoading.value = true
             _errorMessage.value = null
@@ -70,6 +63,25 @@ class MovieDetailsViewModel(
                 _isLoading.value = false
             }
         }
+    }*/
+
+    fun searchMoviesByTitle(title: String) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            _errorMessage.value = null
+            try {
+                val movies = repository.searchMoviesByTitle(title)
+                _searchResults.value = movies
+            } catch (e: Exception) {
+                _errorMessage.value = e.message ?: "Error desconocido"
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    fun selectMovie(movie: Movie) {
+        _movie.value = movie
     }
 
     // Métodos para manejar filtros

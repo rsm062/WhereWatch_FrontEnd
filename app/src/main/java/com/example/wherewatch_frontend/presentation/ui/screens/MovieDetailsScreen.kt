@@ -1,6 +1,6 @@
 package com.example.wherewatch_frontend.presentation.ui.screens
 
-import MovieDetailsViewModel
+import com.example.wherewatch_frontend.presentation.viewmodel.MovieDetailsViewModel
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -36,7 +37,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -53,6 +53,7 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.wherewatch_frontend.domain.model.Country
 import com.example.wherewatch_frontend.domain.model.Platform
+import com.example.wherewatch_frontend.presentation.navigation.Screens
 import com.example.wherewatch_frontend.ui.theme.WhereWatch_FrontEndTheme
 
 
@@ -60,7 +61,6 @@ import com.example.wherewatch_frontend.ui.theme.WhereWatch_FrontEndTheme
 @Composable
 fun MovieDetailScreen(
     navController: NavController,
-    title: String,
     viewModel: MovieDetailsViewModel
 ) {
     val movie by viewModel.movie.collectAsState()
@@ -71,17 +71,27 @@ fun MovieDetailScreen(
     var detailsExpanded by remember { mutableStateOf(false) }
     var filtersExpanded by remember { mutableStateOf(false) }
 
-    LaunchedEffect(title) {
+    /*LaunchedEffect(title) {
         viewModel.loadMovieByTitle(title)
-    }
+    }*/
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { movie?.let { Text(text = it.title) } },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.Search, contentDescription = "Clear Filters")
+                    IconButton(onClick = {
+                        navController.popBackStack() }) {
+                        Icon(Icons.Default.Search, contentDescription = "Go back to list")
+                    }
+                },
+                actions = {
+                    IconButton(onClick = {
+                        navController.navigate(Screens.SearchScreen.route) {
+                            popUpTo(Screens.SearchScreen.route) { inclusive = true }
+                        }
+                    }) {
+                        Icon(Icons.Default.Home, contentDescription = "Inicio")
                     }
                 }
             )

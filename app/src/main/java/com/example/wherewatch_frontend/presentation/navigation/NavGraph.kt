@@ -1,11 +1,12 @@
 package com.example.wherewatch_frontend.presentation.navigation
 
-import MovieDetailsViewModel
+import com.example.wherewatch_frontend.presentation.viewmodel.MovieDetailsViewModel
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.wherewatch_frontend.presentation.ui.screens.MovieDetailScreen
+import com.example.wherewatch_frontend.presentation.ui.screens.MovieSelectionScreen
 import com.example.wherewatch_frontend.presentation.ui.screens.SearchScreen
 import com.example.wherewatch_frontend.presentation.viewmodel.SearchViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -21,10 +22,16 @@ fun NavGraph(startDestination: String = Screens.SearchScreen.route) {
         composable(Screens.SearchScreen.route) {
             SearchScreen(navController, searchViewModel)
         }
-        composable(Screens.MovieDetailsScreen.route) {backStackEntry ->
+        composable(Screens.MovieDetailsScreen.route) {/*backStackEntry ->
+            val title = backStackEntry.arguments?.getString("title")
+            if (title != null) {*/
+                MovieDetailScreen(navController, movieDetailsViewModel)
+            /*}*/
+        }
+        composable(Screens.MovieSelectionScreen.route) {backStackEntry ->
             val title = backStackEntry.arguments?.getString("title")
             if (title != null) {
-                MovieDetailScreen(navController, title, movieDetailsViewModel)
+                MovieSelectionScreen(navController, movieDetailsViewModel, title)
             }
         }
 

@@ -57,7 +57,7 @@ fun SearchScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
-            onClick = { navController.navigate(Screens.MovieDetailsScreen.createRoute(query)) },
+            onClick = { navController.navigate(Screens.MovieSelectionScreen.createRoute(query)) },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp)
