@@ -4,6 +4,7 @@ import com.example.wherewatch_frontend.presentation.viewmodel.MovieDetailsViewMo
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -37,6 +38,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -55,13 +57,19 @@ import com.example.wherewatch_frontend.domain.model.Country
 import com.example.wherewatch_frontend.domain.model.Platform
 import com.example.wherewatch_frontend.presentation.navigation.Screens
 import com.example.wherewatch_frontend.ui.theme.WhereWatch_FrontEndTheme
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.foundation.Image
+import androidx.compose.ui.res.painterResource
+import com.example.wherewatch_frontend.R
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MovieDetailScreen(
     navController: NavController,
-    viewModel: MovieDetailsViewModel
+    viewModel: MovieDetailsViewModel,
+    id: Int
 ) {
     val movie by viewModel.movie.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
@@ -70,10 +78,9 @@ fun MovieDetailScreen(
 
     var detailsExpanded by remember { mutableStateOf(false) }
     var filtersExpanded by remember { mutableStateOf(false) }
-
-    /*LaunchedEffect(title) {
-        viewModel.loadMovieByTitle(title)
-    }*/
+    LaunchedEffect(id) {
+        viewModel.loadMovieById(id)
+    }
 
     Scaffold(
         topBar = {
@@ -81,7 +88,8 @@ fun MovieDetailScreen(
                 title = { movie?.let { Text(text = it.title) } },
                 navigationIcon = {
                     IconButton(onClick = {
-                        navController.popBackStack() }) {
+                        navController.popBackStack()
+                    }) {
                         Icon(Icons.Default.Search, contentDescription = "Go back to list")
                     }
                 },
@@ -93,9 +101,10 @@ fun MovieDetailScreen(
                     }) {
                         Icon(Icons.Default.Home, contentDescription = "Inicio")
                     }
-                }
-            )
-        },floatingActionButton = {
+                },
+
+                )
+        }, floatingActionButton = {
             FloatingActionButton(onClick = {
                 viewModel.clearFilters()
             }) {
@@ -103,128 +112,143 @@ fun MovieDetailScreen(
             }
         },
         content = { innerPadding ->
-            if (isLoading) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
-                }
-            } else if (error != null) {
-                Text("Error: $error", color = Color.Red, modifier = Modifier.padding(16.dp))
-            } else {
-                movie?.let { movie ->
-                    Column(
-                        modifier = Modifier
-                            .padding(innerPadding)
-                            .fillMaxSize()
-                            .padding(16.dp)
-                    ) {
-                        // Card de detalles expandible
-                        Card(
-                            onClick = { detailsExpanded = !detailsExpanded },
-                            modifier = Modifier.fillMaxWidth()
+            Box(modifier = Modifier.fillMaxSize()) {
+                // Imagen de fondo
+                Image(
+                    painter = painterResource(id = R.drawable.background_movie_detail),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.matchParentSize()
+                )
+                if (isLoading) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
+                    }
+                } else if (error != null) {
+                    Text("Error: $error", color = Color.Red, modifier = Modifier.padding(16.dp))
+                } else {
+                    movie?.let { movie ->
+                        Column(
+                            modifier = Modifier
+                                .padding(innerPadding)
+                                .fillMaxSize()
+                                .padding(16.dp)
                         ) {
-                            Column(modifier = Modifier.padding(16.dp)) {
-                                Text("Detalles", style = MaterialTheme.typography.titleMedium)
-                                AnimatedVisibility(
-                                    visible = detailsExpanded,
-                                    enter = expandVertically(),
-                                    exit = shrinkVertically()
-                                ) {
-                                    Column(modifier = Modifier.padding(top = 8.dp)) {
-                                        movie.overview?.let {
-                                            Text(it)
-                                            Spacer(modifier = Modifier.height(8.dp))
-                                        }
-                                        movie.releaseDate?.let {
-                                            Text("Estreno: $it")
+                            // Card de detalles expandible
+                            Card(
+                                onClick = { detailsExpanded = !detailsExpanded },
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Column(modifier = Modifier.padding(16.dp)) {
+                                    Text("Detalles", style = MaterialTheme.typography.titleMedium)
+                                    AnimatedVisibility(
+                                        visible = detailsExpanded,
+                                        enter = expandVertically(),
+                                        exit = shrinkVertically()
+                                    ) {
+                                        Column(modifier = Modifier.padding(top = 8.dp)) {
+                                            movie.overview?.let {
+                                                Text(it)
+                                                Spacer(modifier = Modifier.height(8.dp))
+                                            }
+                                            movie.releaseDate?.let {
+                                                Text("Estreno: $it")
+                                            }
                                         }
                                     }
                                 }
                             }
-                        }
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(16.dp))
 
-                        // Filtros
-                        Button(onClick = { filtersExpanded = !filtersExpanded }) {
-                            Text("Filtrar")
-                        }
-
-                        AnimatedVisibility(
-                            visible = filtersExpanded,
-                            enter = expandVertically(),
-                            exit = shrinkVertically()
-                        ) {
-                            Row(modifier = Modifier.fillMaxWidth()) {
-                                Column(
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .padding(end = 8.dp)
-                                ) {
-                                    Text("Plataformas", fontWeight = FontWeight.Bold)
-                                    movie.availabilities.map { it.platform }.distinct()
-                                        .forEach { platform ->
-                                            val selected =
-                                                viewModel.selectedPlatforms.collectAsState().value.contains(
-                                                    platform
-                                                )
-                                            Row(
-                                                modifier = Modifier
-                                                    .fillMaxWidth()
-                                                    .toggleable(
-                                                        value = selected,
-                                                        onValueChange = {
-                                                            viewModel.togglePlatform(
-                                                                platform
-                                                            )
-                                                        })
-                                            ) {
-                                                Checkbox(checked = selected, onCheckedChange = null)
-                                                Spacer(modifier = Modifier.width(8.dp))
-                                                Text(platform.name)
-                                            }
-                                        }
-                                }
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text("Países", fontWeight = FontWeight.Bold)
-                                    movie.availabilities.map { it.country }.distinct()
-                                        .forEach { country ->
-                                            val selected =
-                                                viewModel.selectedCountries.collectAsState().value.contains(
-                                                    country
-                                                )
-                                            Row(
-                                                modifier = Modifier
-                                                    .fillMaxWidth()
-                                                    .toggleable(
-                                                        value = selected,
-                                                        onValueChange = {
-                                                            viewModel.toggleCountry(
-                                                                country
-                                                            )
-                                                        })
-                                            ) {
-                                                Checkbox(checked = selected, onCheckedChange = null)
-                                                Spacer(modifier = Modifier.width(8.dp))
-                                                Text(country.name)
-                                            }
-                                        }
-                                }
+                            // Filtros
+                            Button(onClick = { filtersExpanded = !filtersExpanded }) {
+                                Text("Filtrar")
                             }
-                            Spacer(modifier = Modifier.height(8.dp))
-                            // Botón de aplicar filtro manual (comentado)
-                            // Button(onClick = { filtersExpanded = false }) { Text("Aplicar Filtros") }
-                        }
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                            AnimatedVisibility(
+                                visible = filtersExpanded,
+                                enter = expandVertically(),
+                                exit = shrinkVertically()
+                            ) {
+                                Row(modifier = Modifier.fillMaxWidth()) {
+                                    Column(
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .padding(end = 8.dp)
+                                    ) {
+                                        Text("Plataformas", fontWeight = FontWeight.Bold)
+                                        movie.availabilities.map { it.platform }.distinct()
+                                            .forEach { platform ->
+                                                val selected =
+                                                    viewModel.selectedPlatforms.collectAsState().value.contains(
+                                                        platform
+                                                    )
+                                                Row(
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .toggleable(
+                                                            value = selected,
+                                                            onValueChange = {
+                                                                viewModel.togglePlatform(
+                                                                    platform
+                                                                )
+                                                            })
+                                                ) {
+                                                    Checkbox(
+                                                        checked = selected,
+                                                        onCheckedChange = null
+                                                    )
+                                                    Spacer(modifier = Modifier.width(8.dp))
+                                                    Text(platform.name)
+                                                }
+                                            }
+                                    }
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text("Países", fontWeight = FontWeight.Bold)
+                                        movie.availabilities.map { it.country }.distinct()
+                                            .forEach { country ->
+                                                val selected =
+                                                    viewModel.selectedCountries.collectAsState().value.contains(
+                                                        country
+                                                    )
+                                                Row(
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .toggleable(
+                                                            value = selected,
+                                                            onValueChange = {
+                                                                viewModel.toggleCountry(
+                                                                    country
+                                                                )
+                                                            })
+                                                ) {
+                                                    Checkbox(
+                                                        checked = selected,
+                                                        onCheckedChange = null
+                                                    )
+                                                    Spacer(modifier = Modifier.width(8.dp))
+                                                    Text(country.name)
+                                                }
+                                            }
+                                    }
+                                }
+                                Spacer(modifier = Modifier.height(8.dp))
+                                // Botón de aplicar filtro manual (comentado)
+                                // Button(onClick = { filtersExpanded = false }) { Text("Aplicar Filtros") }
+                            }
 
-                        // Listado filtrado
-                        LazyColumn(modifier = Modifier.weight(1f)) {
-                            val grouped = filteredAvailabilities.groupBy { it.country }
-                            grouped.forEach { (country, platforms) ->
-                                item {
-                                    MovieCountryCard(
-                                        country = country,
-                                        platforms = platforms.map { it.platform })
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            // Listado filtrado
+                            LazyColumn(modifier = Modifier.weight(1f)) {
+                                val grouped = filteredAvailabilities.groupBy { it.country }
+                                grouped.forEach { (country, platforms) ->
+                                    item {
+                                        MovieCountryCard(
+                                            country = country,
+                                            platforms = platforms.map { it.platform })
+                                    }
                                 }
                             }
                         }
@@ -255,33 +279,28 @@ fun MovieCountryCard(
                 modifier = Modifier.padding(bottom = 8.dp)
             )
 
-            platforms.forEach { platform ->
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .padding(vertical = 4.dp)
-                        .fillMaxWidth()
-                ) {
-                    platform.logoUrl?.let { url ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                platforms.forEach { platform ->
+                    platform.logoPath?.let { logoPath ->
+                        val logoFullUrl = "https://image.tmdb.org/t/p/original$logoPath"
                         AsyncImage(
-                            model = url,
+                            model = logoFullUrl,
                             contentDescription = platform.name,
                             modifier = Modifier
-                                .size(32.dp)
-                                .clip(CircleShape)
+                                .size(40.dp)
+                                .clip(RoundedCornerShape(8.dp))
                         )
-                        Spacer(modifier = Modifier.width(12.dp))
                     }
-
-                    Text(
-                        text = platform.name,
-                        style = MaterialTheme.typography.bodyLarge
-                    )
                 }
             }
         }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable
@@ -293,9 +312,9 @@ fun MovieCountryCardPreview() {
     )
 
     val samplePlatforms = listOf(
-        Platform(id = 1, name = "Netflix", logoUrl = null),
-        Platform(id = 2, name = "HBO Max", logoUrl = null),
-        Platform(id = 3, name = "Amazon Prime", logoUrl = null)
+        Platform(id = 1, name = "Netflix", logoPath = null),
+        Platform(id = 2, name = "HBO Max", logoPath = null),
+        Platform(id = 3, name = "Amazon Prime", logoPath = null)
     )
 
     WhereWatch_FrontEndTheme {

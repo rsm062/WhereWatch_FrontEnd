@@ -1,7 +1,7 @@
 package com.example.wherewatch_frontend.domain.model
 
 data class Platform(
-    val id: Long,
+    val id: Int,
     val name: String,
-    val logoUrl: String?
+    val logoPath: String?
 )

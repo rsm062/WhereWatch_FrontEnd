@@ -9,6 +9,8 @@ fun MovieDTO.toDomain(): Movie {
         title = title,
         overview = overview,
         releaseDate = releaseDate,
+        posterPath = posterPath,
+        rating = rating,
         availabilities = availabilities.map { it.toDomain() }
     )
 }

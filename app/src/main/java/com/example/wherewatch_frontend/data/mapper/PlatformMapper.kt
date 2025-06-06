@@ -7,6 +7,6 @@ fun PlatformDTO.toDomain(): Platform {
     return Platform(
         id = id,
         name = name,
-        logoUrl = logoUrl
+        logoPath = logoPath
     )
 }

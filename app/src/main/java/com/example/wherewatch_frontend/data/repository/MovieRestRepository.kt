@@ -14,4 +14,8 @@ class MovieRestRepository(
         val response = api.searchMoviesByTitle(title)
         return response.map { it.toDomain() }
     }
+    override suspend fun searchMovieById(id: Int): Movie {
+        val response = api.searchMovieById(id)
+        return response.toDomain()
+    }
 }

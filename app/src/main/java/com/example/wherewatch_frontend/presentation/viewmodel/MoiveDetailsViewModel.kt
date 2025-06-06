@@ -50,20 +50,21 @@ class MovieDetailsViewModel(
         } ?: emptyList()
     }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
-    /*fun loadMovieByTitle(title: String) {
+    fun loadMovieById(id: Int) {
         viewModelScope.launch {
             _isLoading.value = true
             _errorMessage.value = null
             try {
-                val movies = repository.searchMoviesByTitle(title)
-                _movie.value = movies.firstOrNull()
+                val movie = repository.searchMovieById(id)
+                _movie.value = movie
             } catch (e: Exception) {
                 _errorMessage.value = e.message ?: "Error desconocido"
+                _movie.value = null
             } finally {
                 _isLoading.value = false
             }
         }
-    }*/
+    }
 
     fun searchMoviesByTitle(title: String) {
         viewModelScope.launch {
