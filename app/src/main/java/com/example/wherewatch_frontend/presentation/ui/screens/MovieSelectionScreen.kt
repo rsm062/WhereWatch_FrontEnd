@@ -41,13 +41,14 @@ import com.example.wherewatch_frontend.R
 import com.example.wherewatch_frontend.domain.model.Movie
 import com.example.wherewatch_frontend.presentation.navigation.Screens
 import com.example.wherewatch_frontend.presentation.viewmodel.MovieDetailsViewModel
+import com.example.wherewatch_frontend.presentation.viewmodel.MovieSelectionViewModel
 import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MovieSelectionScreen(
     navController: NavController,
-    viewModel: MovieDetailsViewModel,
+    viewModel: MovieSelectionViewModel,
     title: String
 ) {
     val movies by viewModel.searchResults.collectAsState()
@@ -76,7 +77,7 @@ fun MovieSelectionScreen(
     ) { padding ->
         Box(modifier = Modifier.fillMaxSize()) {
             Image(
-                painter = painterResource(id = R.drawable.background_movie_detail),
+                painter = painterResource(id = R.drawable.dostirasdepeliculaperforada),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
@@ -99,11 +100,30 @@ fun MovieSelectionScreen(
                     }
 
                     error != null -> {
-                        Text("Error: $error", color = Color.Red)
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "Tenemos problemas con nuestros servidores en este momento, por favor inténtelo de nuevo más tarde o póngase en contacto con nuestro servicio técnico y transmita el error: $error",
+                                color = Color.Red,
+                                style = MaterialTheme.typography.titleLarge,
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
                     }
 
                     movies.isEmpty() -> {
-                        Text("No se encontraron resultados.")
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "No se encontraron resultados.",
+                                style = MaterialTheme.typography.titleLarge,
+                                color = Color.Black
+                            )
+                        }
                     }
 
                     else -> {

@@ -12,4 +12,7 @@ class SearchViewModel : ViewModel() {
         _searchData.value = data
 
     }
+    fun clearSearchData() {
+        _searchData.value = ""
+    }
 }
