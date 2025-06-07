@@ -48,7 +48,7 @@ fun FiltersSection(
 ) {
     Column {
         Button(onClick = onExpandToggle) {
-            Text("Filtrar")
+            Text("Filtros")
         }
 
         AnimatedVisibility(
