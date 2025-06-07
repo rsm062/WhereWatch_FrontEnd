@@ -35,6 +35,14 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TextFieldDefaults
 
 
+/**
+ * Screen that allows the user to input a movie title query to search for movies.
+ * Displays a background image, a logo, a text input field, and a search button.
+ * When the search button is pressed, navigates to the MovieSelectionScreen with the encoded query.
+ *
+ * @param navController [NavController] used for navigation between screens.
+ * @param searchViewModel [SearchViewModel] used to manage the search query state.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(
@@ -64,7 +72,7 @@ fun SearchScreen(
                 painter = painterResource(id = R.drawable.where_watch_logo),
                 contentDescription = "Logo Where Watch",
                 modifier = Modifier
-                    .size(350.dp)// Ajusta tamaño según necesites
+                    .size(350.dp)
                     .padding(bottom = 24.dp)
             )
 
@@ -79,7 +87,7 @@ fun SearchScreen(
                     focusedLabelColor = Color.Black,
                     unfocusedLabelColor = Color.DarkGray,
                     cursorColor = Color.Black,
-                    containerColor = Color.White // Fondo blanco
+                    containerColor = Color.White// White background for better visivility
                 ),
                 modifier = Modifier.fillMaxWidth()
             )
@@ -89,6 +97,7 @@ fun SearchScreen(
 
             Button(
                 onClick = {
+                    // Encode the query safely to be passed in the route
                     val safeQuery = Uri.encode(query)
                     navController.navigate(Screens.MovieSelectionScreen.createRoute(safeQuery))
                     searchViewModel.clearSearchData()
