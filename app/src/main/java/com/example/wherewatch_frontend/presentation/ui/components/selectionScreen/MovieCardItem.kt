@@ -1,5 +1,6 @@
 package com.example.wherewatch_frontend.presentation.ui.components.selectionScreen
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -28,11 +29,13 @@ import java.time.LocalDate
  * @param movie The movie to display.
  * @param onClick Action to perform when the card is clicked (e.g., navigate to detail).
  */
+@SuppressLint("DefaultLocale")
 @Composable
 fun MovieCardItem(
     movie: Movie,
     onClick: () -> Unit
 ) {
+    val rating = String.format("%.1f", movie.rating ?: 0.0)
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -57,16 +60,14 @@ fun MovieCardItem(
                         "Unknown"
                     }
                     Text(
-                        text = "Release: $year",
+                        text = "Estreno: $year",
                         style = MaterialTheme.typography.bodySmall
                     )
                 }
                 Text(
-                    text = "Rating: ${movie.rating ?: 0.0}"
+                    text = "IMDB: $rating"
                 )
-                Text(
-                    text = "id: ${movie.id}"
-                )
+
             }
 
             Spacer(modifier = Modifier.width(16.dp))
