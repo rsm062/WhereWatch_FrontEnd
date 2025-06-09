@@ -57,7 +57,7 @@ fun MovieCardItem(
                     val year = try {
                         LocalDate.parse(it).year
                     } catch (e: Exception) {
-                        "Unknown"
+                        "Error desconocido"
                     }
                     Text(
                         text = "Estreno: $year",
